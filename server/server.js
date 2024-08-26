@@ -1,5 +1,4 @@
 import express from 'express';
-import data from './data.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import seedRouter from './routes/seedRoutes.js';
@@ -8,6 +7,11 @@ import userRouter from './routes/userRoutes.js';
 import orderRouter from './routes/orderRoutes.js';
 import uploadRouter from './routes/uploadRoutes.js';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Define __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -20,7 +24,6 @@ mongoose
     console.log(err.message);
   });
 
-// const path = require('path');
 const app = express();
 
 app.use(express.json());
@@ -42,12 +45,14 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });
 });
 
-app.get('/', (req, res) => {
-  app.use(express.static(path.resolve(__dirname, 'frontend', 'build')));
+// Serve frontend
+app.use(express.static(path.resolve(__dirname, 'frontend', 'build')));
+app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
 });
+
 const port = process.env.PORT || 9189;
 
 app.listen(port, () => {
-  console.log(`serve at http://localhost:${port}`); // Use http instead of https
+  console.log(`serve at http://localhost:${port}`);
 });
